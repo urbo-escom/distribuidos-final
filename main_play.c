@@ -14,6 +14,27 @@
 #define PIXEL_DISTANCE (1)
 
 
+struct {
+	double hue;
+	double sat;
+	double light;
+} colors[] = {
+	{  0.0, 100.0, 50.0},
+	{ 30.0, 100.0, 30.0},
+	{ 60.0, 100.0, 50.0},
+	{ 90.0, 100.0, 30.0},
+	{120.0, 100.0, 50.0},
+	{150.0, 100.0, 30.0},
+	{180.0, 100.0, 50.0},
+	{210.0, 100.0, 30.0},
+	{240.0, 100.0, 50.0},
+	{270.0, 100.0, 30.0},
+	{300.0, 100.0, 50.0},
+	{330.0, 100.0, 30.0},
+};
+size_t colors_len = sizeof(colors)/sizeof(colors[0]);
+
+
 
 
 int32_t time_now_ms(void)
@@ -225,7 +246,11 @@ void* play_thread(void *param)
 				continue;
 			}
 			fprintf(stderr, "JUG [%02d:0x%08x]\n", i, vj->jugadores[i].id);
-			gfx_color_hsl(0.0, 100.0, 60.0);
+			gfx_color_hsl(
+				colors[i%colors_len].hue,
+				colors[i%colors_len].sat,
+				colors[i%colors_len].light
+			);
 			gfx_fill_rect(
 				vj->jugadores[i].pelota.pos.x - vj->jugadores[i].pelota.r/2,
 				vj->jugadores[i].pelota.pos.y - vj->jugadores[i].pelota.r/2,
