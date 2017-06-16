@@ -6,11 +6,33 @@
 #include <time.h>
 
 #include "videojuego.h"
+extern int32_t time_now_ms(void);
 
+static void jugador_remover(struct videojuego *vj)
+{
+	struct jugador jugadores_restantes[JUGADORES];
+	return;
+	pthread_mutex_lock(&vj->lock);
+		int l=1;
+		memcpy(&jugadores_restantes[0], &vj->jugadores[0], sizeof(jugadores_restantes[0]));
+		for(int k=1; k < vj->jugadores_len; k++){
+			if(time_now_ms() - vj->jugadores[k].ultimo_ping <= 3000){
+				continue;
+			}
+			fprintf(stderr, "wwwww\n" );
+			memcpy(&jugadores_restantes[l], &vj->jugadores[k], sizeof(jugadores_restantes[l]));
+			l++;
+		}
+		vj->jugadores_len=l;
+		memcpy(&vj->jugadores, &jugadores_restantes, sizeof(jugadores_restantes));
+
+	pthread_mutex_unlock(&vj->lock);
+}
 
 static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
 {
 	int i;
+
 	pthread_mutex_lock(&vj->lock);
 
 	if (JUGADORES <= vj->jugadores_len)
@@ -21,8 +43,10 @@ static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
 			continue;
 		vj->jugadores[i].pelota.pos.x = qm->mensaje.datos.jugador.x;
 		vj->jugadores[i].pelota.pos.y = qm->mensaje.datos.jugador.y;
+		vj->jugadores[i].ultimo_ping = time_now_ms();
 
 		pthread_mutex_unlock(&vj->lock);
+		jugador_remover(vj);
 		return;
 	}
 	vj->jugadores[i].id           = qm->mensaje.datos.jugador.id;
@@ -33,9 +57,9 @@ static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
 	fprintf(stderr, "Player %d added\n", vj->jugadores[i].id);
 
 	pthread_mutex_unlock(&vj->lock);
+	jugador_remover(vj);
 	return;
 }
-
 
 static void process_message(struct videojuego *vj, struct queue_message *qm)
 {
@@ -88,8 +112,10 @@ void* recv_thread(void *param)
 		int s;
 
 		s = socket_recvfrom(vj->sock, m, sizeof(*m), &vj->peer_addr);
-		if (-1 == s && EAGAIN == errno)
+		if (-1 == s && EAGAIN == errno){
+			jugador_remover(vj);
 			continue;
+		}
 		if (s <= 0)
 			continue;
 		if (m->id == vj->id)

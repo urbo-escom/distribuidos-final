@@ -13,7 +13,7 @@
 #endif
 
 #ifndef JUGADORES
-#define JUGADORES (16)
+#define JUGADORES (100)
 #endif
 
 

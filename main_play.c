@@ -221,6 +221,9 @@ void* play_thread(void *param)
 
 		pthread_mutex_lock(&vj->lock);
 		for (i = 0; i < vj->jugadores_len; i++) {
+			if(i != 0 && time_now_ms() - vj->jugadores[i].ultimo_ping >= 3000) {
+				continue;
+			}
 			fprintf(stderr, "JUG [%02d:0x%08x]\n", i, vj->jugadores[i].id);
 			gfx_color_hsl(0.0, 100.0, 60.0);
 			gfx_fill_rect(
@@ -240,7 +243,7 @@ void* play_thread(void *param)
 		qm->mensaje.datos.jugador.y  = vj->jugadores[0].pelota.pos.y;
 		memcpy(&qm->addr, &vj->group_addr, sizeof(qm->addr));
 		queue_enqueue(vj->queue_send, qm);
-
+		
 		gfx_draw();
 		gfx_sleep_ms(16);
 	}
