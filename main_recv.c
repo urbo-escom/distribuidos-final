@@ -62,6 +62,8 @@ void* recv_thread(void *param)
 			continue;
 		if (s <= 0)
 			continue;
+		if (m->id == vj->id)
+			continue;
 
 
 		socket_addr_get_ipv4(&vj->peer_addr, phost, sizeof(phost));

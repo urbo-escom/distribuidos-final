@@ -25,8 +25,9 @@ enum mensaje_tipo {
 
 
 struct mensaje {
-	uint8_t tipo;
-	int32_t tiempo;
+	uint16_t id;
+	uint8_t  tipo;
+	int32_t  tiempo;
 	union {
 		char mapa[MAPA_YLEN][MAPA_XLEN];
 		struct {
@@ -82,6 +83,7 @@ struct jugador {
 
 
 struct videojuego {
+	uint8_t      id;
 	const char  *host;
 	const char  *group;
 	int          port;

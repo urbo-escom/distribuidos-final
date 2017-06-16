@@ -122,6 +122,7 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	{
+		vj->id       = (uint16_t)rand();
 		vj->group    = "224.0.0.1";
 		vj->port     = 7000;
 		vj->tile_length = 25;
@@ -197,11 +198,13 @@ int main(int argc, char **argv)
 */
 
 
+	vj->jugadores[0].id = (srand(time(NULL)), rand());
 	vj->jugadores[0].pelota.r     = vj->tile_length/4;
 	vj->jugadores[0].pelota.pos.x = vj->tile_length/2;
 	vj->jugadores[0].pelota.pos.y = vj->tile_length/2;
 	vj->jugadores[0].pelota.dpos.x = 0;
 	vj->jugadores[0].pelota.dpos.y = 0;
+	vj->jugadores_len++;
 
 
 	vj->bg_color.hue   = 210.0;

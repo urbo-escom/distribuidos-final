@@ -24,6 +24,13 @@ void* send_thread(void *param)
 			return NULL;
 
 
+		qm->mensaje.id = vj->id;
+		s = socket_sendto(vj->sock, qm, sizeof(*qm), &vj->group_addr);
+		if (-1 == s) {
+			perror("socket_sendto");
+			continue;
+		}
+
 		socket_addr_get_ipv4(&vj->group_addr, phost, sizeof(phost));
 		socket_addr_get_ipv4(&vj->self_addr, shost, sizeof(shost));
 		socket_addr_get_port(&vj->group_addr, &pport);

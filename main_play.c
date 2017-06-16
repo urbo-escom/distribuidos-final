@@ -1,11 +1,34 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
+#include <stdio.h>
+#include <time.h>
 
 #include "videojuego.h"
 #include "gfx_v3.h"
 
 #define PIXEL_SPEED    (3)
 #define PIXEL_DISTANCE (1)
+
+
+
+
+int32_t time_now_ms(void)
+{
+	struct timespec spec;
+	long            ms;
+	time_t          s;
+
+	clock_gettime(CLOCK_REALTIME, &spec);
+
+	s  = spec.tv_sec;
+	ms = round(spec.tv_nsec/1.0e6);
+
+	return s*1000 + ms;
+}
 
 
 void jugador_update(struct videojuego *vj, struct jugador *j)
@@ -127,7 +150,10 @@ void* play_thread(void *param)
 	gfx_color_hsl(30.0, 90.0, 80.0);
 	init_handlers();
 
+
 	while (1) {
+		struct queue_message  qm_alloc = {{0}};
+		struct queue_message *qm = &qm_alloc;
 		int x = 0;
 		int y = 0;
 		int i;
@@ -143,7 +169,9 @@ void* play_thread(void *param)
 		gfx_clear();
 
 
-		jugador_update(vj, &vj->jugadores[0]);
+		for (i = 0; i < vj->jugadores_len; i++)
+			jugador_update(vj, &vj->jugadores[i]);
+
 		if (-1 == jugador_check_collision(vj, &vj->jugadores[0])) {
 			vj->bg_color.hue   = 330.0;
 			vj->bg_color.sat   =  80.0;
@@ -158,6 +186,7 @@ void* play_thread(void *param)
 			vj->bg_color.sat   = 80.0;
 			vj->bg_color.light = 20.0;
 		}
+
 		for (i = 0; i < MAPA_YLEN; i++) {
 			x = 0;
 			for (j = 0; j < MAPA_XLEN; j++) {
@@ -176,13 +205,23 @@ void* play_thread(void *param)
 			}
 			y += vj->tile_length;
 		}
-		gfx_color_hsl(0.0, 100.0, 60.0);
-		gfx_fill_rect(
-			vj->jugadores[0].pelota.pos.x - vj->jugadores[0].pelota.r/2,
-			vj->jugadores[0].pelota.pos.y - vj->jugadores[0].pelota.r/2,
-			2*vj->jugadores[0].pelota.r,
-			2*vj->jugadores[0].pelota.r
-		);
+		for (i = 0; i < vj->jugadores_len; i++) {
+			gfx_color_hsl(0.0, 100.0, 60.0);
+			gfx_fill_rect(
+				vj->jugadores[i].pelota.pos.x - vj->jugadores[i].pelota.r/2,
+				vj->jugadores[i].pelota.pos.y - vj->jugadores[i].pelota.r/2,
+				2*vj->jugadores[i].pelota.r,
+				2*vj->jugadores[i].pelota.r
+			);
+		}
+
+		qm->mensaje.tipo = MENSAJE_POSICION;
+		qm->mensaje.tiempo = time_now_ms();
+		qm->mensaje.datos.jugador.id = vj->jugadores[i].id;
+		qm->mensaje.datos.jugador.x = vj->jugadores[i].pelota.pos.x;
+		qm->mensaje.datos.jugador.y = vj->jugadores[i].pelota.pos.y;
+		memcpy(&qm->addr, &vj->group_addr, sizeof(qm->addr));
+		queue_enqueue(vj->queue_send, qm);
 
 		gfx_draw();
 		gfx_sleep_ms(16);
