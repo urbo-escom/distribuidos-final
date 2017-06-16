@@ -28,7 +28,7 @@ src += ${program}.c
 src += ${program}_send.c
 src += ${program}_recv.c
 src += ${program}_play.c
-src += gfx.c
+src += gfx_v3.c
 obj := ${src:%.c=${dstdir}/%.o}
 
 

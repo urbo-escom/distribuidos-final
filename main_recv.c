@@ -58,9 +58,8 @@ void* recv_thread(void *param)
 		int s;
 
 		s = socket_recvfrom(vj->sock, m, sizeof(*m), &vj->peer_addr);
-		if (-1 == s && EAGAIN == errno) {
-			fprintf(stderr, "timeout\n");
-		}
+		if (-1 == s && EAGAIN == errno)
+			continue;
 		if (s <= 0)
 			continue;
 

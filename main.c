@@ -124,7 +124,52 @@ int main(int argc, char **argv)
 	{
 		vj->group    = "224.0.0.1";
 		vj->port     = 7000;
+		vj->tile_length = 25;
 	}
+
+
+	strcpy(vj->mapa[ 0], "  xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 1], "x xxxx        xxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 2], "x   xx xxxxxx xxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 3], "x           x xxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 4], "x xxxxxxxxxxx xxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 5], "x x           xxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 6], "x x xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 7], "x x      xxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 8], "x xxxxxx xxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[ 9], "x        xxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[10], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[11], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[12], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[13], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[14], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[15], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[16], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[17], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[18], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[19], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[20], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[21], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[22], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[23], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[24], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[25], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[26], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[27], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[28], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[29], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[30], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	strcpy(vj->mapa[31], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+	vj->jugadores[0].pelota.r     = vj->tile_length/4;
+	vj->jugadores[0].pelota.pos.x = vj->tile_length/2;
+	vj->jugadores[0].pelota.pos.y = vj->tile_length/2;
+	vj->jugadores[0].pelota.dpos.x = 0;
+	vj->jugadores[0].pelota.dpos.y = 0;
+
+
+	vj->bg_color.hue   = 210.0;
+	vj->bg_color.sat   = 80.0;
+	vj->bg_color.light = 20.0;
 
 
 	progname = argv[0];
@@ -159,7 +204,6 @@ int main(int argc, char **argv)
 
 
 	vj->queue_send = queue_create(sizeof(struct queue_message));
-
 
 	print_options(vj);
 

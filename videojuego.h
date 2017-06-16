@@ -5,6 +5,14 @@
 #include "queue.h"
 
 
+#ifndef MAPA_XLEN
+#define MAPA_XLEN (20)
+#endif
+#ifndef MAPA_YLEN
+#define MAPA_YLEN (20)
+#endif
+
+
 enum mensaje_tipo {
 	MENSAJE_PING     = 0,
 	MENSAJE_PONG     = 1,
@@ -20,15 +28,11 @@ struct mensaje {
 	uint8_t tipo;
 	int32_t tiempo;
 	union {
-		char mapa[32][32];
+		char mapa[MAPA_YLEN][MAPA_XLEN];
 		struct {
-			uint8_t x;
-			uint8_t y;
-		} monedas[100];
-		struct {
-			uint8_t id;
-			uint8_t x;
-			uint8_t y;
+			uint8_t  id;
+			uint16_t x;
+			uint16_t y;
 		} jugador;
 	} datos;
 };
@@ -54,6 +58,29 @@ extern void* send_thread(void*);
 extern void* play_thread(void*);
 
 
+struct pos {
+	int x;
+	int y;
+};
+
+
+struct pelota {
+	struct pos pos;
+	struct pos dpos;
+	struct pos ddpos;
+	int        r;
+};
+
+
+struct jugador {
+	uint8_t            id;
+	struct socket_addr addr;
+	int                ultimo_ping;
+	uint8_t            estado;
+	struct pelota      pelota;
+};
+
+
 struct videojuego {
 	const char  *host;
 	const char  *group;
@@ -66,21 +93,19 @@ struct videojuego {
 
 	queue *queue_send;
 
+
+	int width;
+	int height;
+	int tile_length;
+
+	char mapa[MAPA_YLEN][MAPA_XLEN + 1];
+	struct {
+		int hue;
+		int sat;
+		int light;
+	} bg_color;
+
 	pthread_mutex_t lock;
-
-	struct {
-		struct socket_addr addr;
-		int16_t            ultimo_ping;
-		uint8_t            estado;
-		uint8_t id;
-		uint16_t x;
-		uint16_t y;
-	}      jugadores[16];
-	size_t jugadores_len;
-
-	struct {
-		uint8_t x;
-		uint8_t y;
-	}      monedas[100];
-	size_t monedas_len;
+	struct jugador  jugadores[16];
+	size_t          jugadores_len;
 };
