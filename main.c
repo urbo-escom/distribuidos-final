@@ -242,6 +242,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
+	pthread_mutex_init(&vj->lock, NULL);
 
 	vj->queue_send = queue_create(sizeof(struct queue_message));
 

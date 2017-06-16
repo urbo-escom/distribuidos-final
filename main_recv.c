@@ -8,6 +8,35 @@
 #include "videojuego.h"
 
 
+static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
+{
+	int i;
+	pthread_mutex_lock(&vj->lock);
+
+	if (JUGADORES <= vj->jugadores_len)
+		return;
+
+	for (i = 0; i < vj->jugadores_len; i++) {
+		if (vj->jugadores[i].id != qm->mensaje.datos.jugador.id)
+			continue;
+		vj->jugadores[i].pelota.pos.x = qm->mensaje.datos.jugador.x;
+		vj->jugadores[i].pelota.pos.y = qm->mensaje.datos.jugador.y;
+
+		pthread_mutex_unlock(&vj->lock);
+		return;
+	}
+	vj->jugadores[i].id           = qm->mensaje.datos.jugador.id;
+	vj->jugadores[i].pelota.r     = vj->jugadores[0].pelota.r;
+	vj->jugadores[i].pelota.pos.x = qm->mensaje.datos.jugador.x;
+	vj->jugadores[i].pelota.pos.y = qm->mensaje.datos.jugador.y;
+	vj->jugadores_len++;
+	fprintf(stderr, "Player %d added\n", vj->jugadores[i].id);
+
+	pthread_mutex_unlock(&vj->lock);
+	return;
+}
+
+
 static void process_message(struct videojuego *vj, struct queue_message *qm)
 {
 	switch (qm->mensaje.tipo) {
@@ -34,6 +63,7 @@ static void process_message(struct videojuego *vj, struct queue_message *qm)
 		break;
 
 	case MENSAJE_POSICION:
+		jugador_agregar(vj, qm);
 		break;
 
 		/* queue_enqueue(vj->queue_fs, op); */

@@ -31,13 +31,20 @@ int32_t time_now_ms(void)
 }
 
 
-void jugador_update(struct videojuego *vj, struct jugador *j)
+void update_jugadores(struct videojuego *vj)
 {
-	(void)*vj;
-	j->pelota.pos.x  += j->pelota.dpos.x;
-	j->pelota.dpos.x *= 0.95;
-	j->pelota.pos.y  += j->pelota.dpos.y;
-	j->pelota.dpos.y *= 0.95;
+	struct jugador *j;
+	int i;
+
+	pthread_mutex_lock(&vj->lock);
+	for (i = 0; i < vj->jugadores_len; i++) {
+		j = &vj->jugadores[i];
+		j->pelota.pos.x  += j->pelota.dpos.x;
+		j->pelota.dpos.x *= 0.95;
+		j->pelota.pos.y  += j->pelota.dpos.y;
+		j->pelota.dpos.y *= 0.95;
+	}
+	pthread_mutex_unlock(&vj->lock);
 }
 
 
@@ -51,44 +58,49 @@ int jugador_check_collision_tile(struct videojuego *vj, int i, int j, struct jug
 	int a1;
 	int b0;
 	int b1;
-		x0 = j*vj->tile_length;
-		y0 = i*vj->tile_length;
-		x1 = x0 + vj->tile_length;
-		y1 = y0 + vj->tile_length;
-		a0 = jj->pelota.pos.x - jj->pelota.r;
-		a1 = jj->pelota.pos.x + jj->pelota.r;
-		b0 = jj->pelota.pos.y - jj->pelota.r;
-		b1 = jj->pelota.pos.y + jj->pelota.r;
+	int s = 0;
 
-	if ((x0 < a0 && a1 < x1)
-	&&  (y0 < b0 && b1 < y1))
-		return -1;
+	x0 = j*vj->tile_length;
+	y0 = i*vj->tile_length;
+	x1 = x0 + vj->tile_length;
+	y1 = y0 + vj->tile_length;
+	a0 = jj->pelota.pos.x - jj->pelota.r;
+	a1 = jj->pelota.pos.x + jj->pelota.r;
+	b0 = jj->pelota.pos.y - jj->pelota.r;
+	b1 = jj->pelota.pos.y + jj->pelota.r;
 
-	if ((a0 < x0 && x0 < a1)
-	&&  (b0 < y0 && y0 < b1))
-		return -1;
+	if (0)
+		;
 
-	if ((a0 < x0 && x0 < a1)
-	&&  (b0 < y1 && y1 < b1))
-		return -1;
+	else if ((x0 < a0 && a1 < x1)
+	&&       (y0 < b0 && b1 < y1))
+		s = -1;
 
-	if ((a0 < x1 && x1 < a1)
-	&&  (b0 < y1 && y1 < b1))
-		return -1;
+	else if ((a0 < x0 && x0 < a1)
+	&&       (b0 < y0 && y0 < b1))
+		s = -1;
 
-	if ((a0 < x1 && x1 < a1)
-	&&  (b0 < y0 && y0 < b1))
-		return -1;
+	else if ((a0 < x0 && x0 < a1)
+	&&       (b0 < y1 && y1 < b1))
+		s = -1;
 
-	if ((x0 < a0 && a1 < x1)
+	else if ((a0 < x1 && x1 < a1)
+	&&       (b0 < y1 && y1 < b1))
+		s = -1;
+
+	else if ((a0 < x1 && x1 < a1)
+	&&       (b0 < y0 && y0 < b1))
+		s = -1;
+
+	else if ((x0 < a0 && a1 < x1)
 	&&  ((b0 < y0 && y0 < b1) || (b0 < y1 && y1 < b1)))
-		return -1;
+		s = -1;
 
-	if ((y0 < b0 && b1 < y1)
+	else if ((y0 < b0 && b1 < y1)
 	&&  ((a0 < x0 && x0 < a1) || (a0 < x1 && x1 < a1)))
-		return -1;
+		s = -1;
 
-	return 0;
+	return s;
 }
 
 
@@ -129,12 +141,14 @@ void handle_keypress(struct videojuego *vj, struct gfx_event *e)
 	if (GFX_KEY_CURSOR != k->type)
 		return;
 
+	pthread_mutex_lock(&vj->lock);
 	switch (k->value[0]) {
 	case GFX_KEY_LEFT:  j->pelota.dpos.x -= PIXEL_SPEED; j->pelota.pos.x -= PIXEL_DISTANCE; break;
 	case GFX_KEY_UP:    j->pelota.dpos.y -= PIXEL_SPEED; j->pelota.pos.y -= PIXEL_DISTANCE; break;
 	case GFX_KEY_RIGHT: j->pelota.dpos.x += PIXEL_SPEED; j->pelota.pos.x += PIXEL_DISTANCE; break;
 	case GFX_KEY_DOWN:  j->pelota.dpos.y += PIXEL_SPEED; j->pelota.pos.y += PIXEL_DISTANCE; break;
 	}
+	pthread_mutex_unlock(&vj->lock);
 }
 
 
@@ -169,8 +183,7 @@ void* play_thread(void *param)
 		gfx_clear();
 
 
-		for (i = 0; i < vj->jugadores_len; i++)
-			jugador_update(vj, &vj->jugadores[i]);
+		update_jugadores(vj);
 
 		if (-1 == jugador_check_collision(vj, &vj->jugadores[0])) {
 			vj->bg_color.hue   = 330.0;
@@ -205,7 +218,10 @@ void* play_thread(void *param)
 			}
 			y += vj->tile_length;
 		}
+
+		pthread_mutex_lock(&vj->lock);
 		for (i = 0; i < vj->jugadores_len; i++) {
+			fprintf(stderr, "JUG [%02d:0x%08x]\n", i, vj->jugadores[i].id);
 			gfx_color_hsl(0.0, 100.0, 60.0);
 			gfx_fill_rect(
 				vj->jugadores[i].pelota.pos.x - vj->jugadores[i].pelota.r/2,
@@ -214,12 +230,14 @@ void* play_thread(void *param)
 				2*vj->jugadores[i].pelota.r
 			);
 		}
+		pthread_mutex_unlock(&vj->lock);
+
 
 		qm->mensaje.tipo = MENSAJE_POSICION;
 		qm->mensaje.tiempo = time_now_ms();
-		qm->mensaje.datos.jugador.id = vj->jugadores[i].id;
-		qm->mensaje.datos.jugador.x = vj->jugadores[i].pelota.pos.x;
-		qm->mensaje.datos.jugador.y = vj->jugadores[i].pelota.pos.y;
+		qm->mensaje.datos.jugador.id = vj->jugadores[0].id;
+		qm->mensaje.datos.jugador.x  = vj->jugadores[0].pelota.pos.x;
+		qm->mensaje.datos.jugador.y  = vj->jugadores[0].pelota.pos.y;
 		memcpy(&qm->addr, &vj->group_addr, sizeof(qm->addr));
 		queue_enqueue(vj->queue_send, qm);
 

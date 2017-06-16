@@ -12,6 +12,10 @@
 #define MAPA_YLEN (20)
 #endif
 
+#ifndef JUGADORES
+#define JUGADORES (16)
+#endif
+
 
 enum mensaje_tipo {
 	MENSAJE_PING     = 0,
@@ -108,6 +112,6 @@ struct videojuego {
 	} bg_color;
 
 	pthread_mutex_t lock;
-	struct jugador  jugadores[16];
+	struct jugador  jugadores[JUGADORES];
 	size_t          jugadores_len;
 };
