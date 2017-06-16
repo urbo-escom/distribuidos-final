@@ -160,6 +160,43 @@ int main(int argc, char **argv)
 	strcpy(vj->mapa[29], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	strcpy(vj->mapa[30], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 	strcpy(vj->mapa[31], "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+
+/*
+	strcpy(vj->mapa[ 0], "                                ");
+	strcpy(vj->mapa[ 1], "                                ");
+	strcpy(vj->mapa[ 2], "       x                        ");
+	strcpy(vj->mapa[ 3], "                                ");
+	strcpy(vj->mapa[ 4], "                                ");
+	strcpy(vj->mapa[ 5], "                                ");
+	strcpy(vj->mapa[ 6], "                                ");
+	strcpy(vj->mapa[ 7], "                                ");
+	strcpy(vj->mapa[ 8], "                                ");
+	strcpy(vj->mapa[ 9], "                                ");
+	strcpy(vj->mapa[10], "                                ");
+	strcpy(vj->mapa[11], "                                ");
+	strcpy(vj->mapa[12], "                                ");
+	strcpy(vj->mapa[13], "                                ");
+	strcpy(vj->mapa[14], "                                ");
+	strcpy(vj->mapa[15], "                                ");
+	strcpy(vj->mapa[16], "                                ");
+	strcpy(vj->mapa[17], "                                ");
+	strcpy(vj->mapa[18], "                                ");
+	strcpy(vj->mapa[19], "                                ");
+	strcpy(vj->mapa[20], "                                ");
+	strcpy(vj->mapa[21], "                                ");
+	strcpy(vj->mapa[22], "                                ");
+	strcpy(vj->mapa[23], "                                ");
+	strcpy(vj->mapa[24], "                                ");
+	strcpy(vj->mapa[25], "                                ");
+	strcpy(vj->mapa[26], "                                ");
+	strcpy(vj->mapa[27], "                                ");
+	strcpy(vj->mapa[28], "                                ");
+	strcpy(vj->mapa[29], "                                ");
+	strcpy(vj->mapa[30], "                                ");
+	strcpy(vj->mapa[31], "                                ");
+*/
+
+
 	vj->jugadores[0].pelota.r     = vj->tile_length/4;
 	vj->jugadores[0].pelota.pos.x = vj->tile_length/2;
 	vj->jugadores[0].pelota.pos.y = vj->tile_length/2;
