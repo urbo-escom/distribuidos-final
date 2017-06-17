@@ -36,6 +36,8 @@ struct mensaje {
 		char mapa[MAPA_YLEN][MAPA_XLEN];
 		struct {
 			uint8_t  id;
+			uint64_t choques;
+			uint64_t puntos;
 			uint16_t x;
 			uint16_t y;
 		} jugador;
@@ -81,6 +83,8 @@ struct jugador {
 	uint8_t            id;
 	struct socket_addr addr;
 	int                ultimo_ping;
+	uint64_t            choques;
+	uint64_t            puntos;
 	uint8_t            estado;
 	struct pelota      pelota;
 };

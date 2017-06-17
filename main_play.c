@@ -180,7 +180,7 @@ void* play_thread(void *param)
 	vj->width  = MAPA_XLEN*vj->tile_length;
 	vj->height = MAPA_YLEN*vj->tile_length;
 
-	gfx_open(vj->width, vj->height, "Videojuego");
+	gfx_open(vj->width, vj->height + 100, "Videojuego");
 	gfx_bg_color_hsl(30.0, 100.0, 10.0);
 	gfx_color_hsl(30.0, 90.0, 80.0);
 	init_handlers();
@@ -207,6 +207,8 @@ void* play_thread(void *param)
 		update_jugadores(vj);
 
 		if (-1 == jugador_check_collision(vj, &vj->jugadores[0])) {
+			vj->jugadores[0].choques++;
+			vj->jugadores[0].puntos = 0;
 			vj->bg_color.hue   = 330.0;
 			vj->bg_color.sat   =  80.0;
 			vj->bg_color.light =  60.0;
@@ -216,6 +218,7 @@ void* play_thread(void *param)
 			vj->jugadores[0].pelota.dpos.x = 0;
 			vj->jugadores[0].pelota.dpos.y = 0;
 		} else {
+			vj->jugadores[0].puntos++;
 			vj->bg_color.hue   = 210.0;
 			vj->bg_color.sat   = 80.0;
 			vj->bg_color.light = 20.0;
@@ -242,6 +245,7 @@ void* play_thread(void *param)
 
 		pthread_mutex_lock(&vj->lock);
 		for (i = 0; i < vj->jugadores_len; i++) {
+			char score[1024];
 			if(i != 0 && time_now_ms() - vj->jugadores[i].ultimo_ping >= 3000) {
 				continue;
 			}
@@ -251,6 +255,11 @@ void* play_thread(void *param)
 				colors[i%colors_len].sat,
 				colors[i%colors_len].light
 			);
+			sprintf(score, "ID(0x%04x) +%llu/-%llu",
+				vj->jugadores[i].id,
+				(unsigned long long)vj->jugadores[i].puntos,
+				(unsigned long long)vj->jugadores[i].choques);
+			gfx_txt(10, vj->height + 12 + 12*i, score);
 			gfx_fill_rect(
 				vj->jugadores[i].pelota.pos.x - vj->jugadores[i].pelota.r/2,
 				vj->jugadores[i].pelota.pos.y - vj->jugadores[i].pelota.r/2,
@@ -266,6 +275,8 @@ void* play_thread(void *param)
 		qm->mensaje.datos.jugador.id = vj->jugadores[0].id;
 		qm->mensaje.datos.jugador.x  = vj->jugadores[0].pelota.pos.x;
 		qm->mensaje.datos.jugador.y  = vj->jugadores[0].pelota.pos.y;
+		qm->mensaje.datos.jugador.puntos  = vj->jugadores[0].puntos;
+		qm->mensaje.datos.jugador.choques  = vj->jugadores[0].choques;
 		memcpy(&qm->addr, &vj->group_addr, sizeof(qm->addr));
 		queue_enqueue(vj->queue_send, qm);
 		

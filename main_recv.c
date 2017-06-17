@@ -43,6 +43,8 @@ static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
 			continue;
 		vj->jugadores[i].pelota.pos.x = qm->mensaje.datos.jugador.x;
 		vj->jugadores[i].pelota.pos.y = qm->mensaje.datos.jugador.y;
+		vj->jugadores[i].choques      = qm->mensaje.datos.jugador.choques;
+		vj->jugadores[i].puntos       = qm->mensaje.datos.jugador.puntos;
 		vj->jugadores[i].ultimo_ping = time_now_ms();
 
 		pthread_mutex_unlock(&vj->lock);
@@ -53,6 +55,8 @@ static void jugador_agregar(struct videojuego *vj, struct queue_message *qm)
 	vj->jugadores[i].pelota.r     = vj->jugadores[0].pelota.r;
 	vj->jugadores[i].pelota.pos.x = qm->mensaje.datos.jugador.x;
 	vj->jugadores[i].pelota.pos.y = qm->mensaje.datos.jugador.y;
+	vj->jugadores[i].choques      = qm->mensaje.datos.jugador.choques;
+	vj->jugadores[i].puntos       = qm->mensaje.datos.jugador.puntos;
 	vj->jugadores_len++;
 	fprintf(stderr, "Player %d added\n", vj->jugadores[i].id);
 
