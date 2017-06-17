@@ -10,6 +10,8 @@
 
 const char *progname = "laberynth";
 
+extern int32_t time_now_ms(void);
+
 
 void print_options(struct videojuego *vj)
 {
@@ -159,6 +161,7 @@ int main(int argc, char **argv)
 	vj->jugadores[0].pelota.pos.y = vj->tile_length/2;
 	vj->jugadores[0].pelota.dpos.x = 0;
 	vj->jugadores[0].pelota.dpos.y = 0;
+	vj->jugadores[0].ultimo_movimiento = time_now_ms();
 	vj->jugadores_len++;
 
 

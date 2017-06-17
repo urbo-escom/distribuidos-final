@@ -10,7 +10,7 @@
 #include "videojuego.h"
 #include "gfx_v3.h"
 
-#define PIXEL_SPEED    (3)
+#define PIXEL_SPEED    (4)
 #define PIXEL_DISTANCE (1)
 
 
@@ -169,6 +169,7 @@ void handle_keypress(struct videojuego *vj, struct gfx_event *e)
 	case GFX_KEY_RIGHT: j->pelota.dpos.x += PIXEL_SPEED; j->pelota.pos.x += PIXEL_DISTANCE; break;
 	case GFX_KEY_DOWN:  j->pelota.dpos.y += PIXEL_SPEED; j->pelota.pos.y += PIXEL_DISTANCE; break;
 	}
+	j->ultimo_movimiento = time_now_ms();
 	pthread_mutex_unlock(&vj->lock);
 }
 
@@ -218,7 +219,13 @@ void* play_thread(void *param)
 			vj->jugadores[0].pelota.dpos.x = 0;
 			vj->jugadores[0].pelota.dpos.y = 0;
 		} else {
-			vj->jugadores[0].puntos++;
+			if ((time_now_ms() - vj->jugadores[0].ultimo_movimiento) < 300) {
+				vj->jugadores[0].puntos++;
+			}
+			if (1000 < (time_now_ms() - vj->jugadores[0].ultimo_movimiento)) {
+				if (vj->jugadores[0].puntos)
+					vj->jugadores[0].puntos--;
+			}
 			vj->bg_color.hue   = 210.0;
 			vj->bg_color.sat   = 80.0;
 			vj->bg_color.light = 20.0;

@@ -83,8 +83,9 @@ struct jugador {
 	uint8_t            id;
 	struct socket_addr addr;
 	int                ultimo_ping;
-	uint64_t            choques;
-	uint64_t            puntos;
+	int                ultimo_movimiento;
+	uint64_t           choques;
+	uint64_t           puntos;
 	uint8_t            estado;
 	struct pelota      pelota;
 };
