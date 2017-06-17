@@ -236,7 +236,7 @@ void* play_thread(void *param)
 			for (j = 0; j < MAPA_XLEN; j++) {
 				if (' ' != vj->mapa[i][j]) {
 					gfx_color_hsl(
-						vj->bg_color.hue,
+						vj->bg_color.hue + 100.0*sin(time_now_ms()/1000.0),
 						vj->bg_color.sat,
 						vj->bg_color.light
 					);
